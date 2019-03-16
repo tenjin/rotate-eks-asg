@@ -9,4 +9,4 @@ install:
 	GO111MODULE=on go install -mod=vendor ./cmd/pinger
 test:
 	go install ./cmd/rotate-eks-asg
-	rotate-eks-asg cluster-name asg-name
+	awsudo -u staging rotate-eks-asg staging-us asg-name

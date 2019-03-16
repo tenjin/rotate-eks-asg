@@ -1,11 +1,19 @@
 package main
 
 import (
-	"github.com/complex64/go-utils/pkg/ctxutil"
-	"github.com/tenjin/rotate-eks-asg/internal/pkg/cmd"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 	"os"
+
+	"github.com/complex64/go-utils/pkg/ctxutil"
+	"gopkg.in/alecthomas/kingpin.v2"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/tenjin/rotate-eks-asg/internal/pkg/cmd"
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth/exec"
 )
 
 const (
@@ -19,7 +27,8 @@ var (
 
 func main() {
 	kingpin.Parse()
-	ctx, _ := ctxutil.ContextWithCancelSignals(os.Kill, os.Interrupt)
+	ctx, cancel := ctxutil.ContextWithCancelSignals(os.Kill, os.Interrupt)
+	defer cancel()
 
 	log.Print("Fetching EKS configuration...")
 	eksCfgCmd := cmd.New("aws",
@@ -30,5 +39,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	config, err := clientcmd.BuildConfigFromFlags("", "/tmp/.kube/config") // TODO
+	if err != nil {
+		panic(err.Error())
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
 
+	nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for i,node := range nodes.Items {
+		log.Printf("%d: %s", (i+1), node.Name)
+	}
 }
