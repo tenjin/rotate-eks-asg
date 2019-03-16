@@ -31,5 +31,6 @@ COPY --from=buildenv /rotate-eks-asg /usr/local/bin/
 
 RUN chmod +x \
     /usr/local/bin/kubectl \
-    /usr/local/bin/aws-iam-authenticator \
-    /usr/local/bin/rotate-eks-asg
+    /usr/local/bin/aws-iam-authenticator
+
+ENTRYPOINT ["/usr/local/bin/rotate-eks-asg"]
