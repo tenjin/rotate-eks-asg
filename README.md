@@ -2,6 +2,8 @@
 
 Rolling Cluster Node Upgrades for AWS EKS
 
+**Project Status:** Work in progress and not ready for use at this moment. 
+
 ## Use Case
 
 Apply security fixes, rollout new Kubernetes versions, or replace faulty nodes on AWS.
