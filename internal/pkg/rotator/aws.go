@@ -2,6 +2,7 @@ package rotator
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
@@ -45,6 +46,7 @@ func getAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*autosca
 }
 
 func DetachInstance(client *autoscaling.AutoScaling, groupId, id string) error {
+	fmt.Printf("Detaching instance '%s' from ASG '%s'...", id, groupId)
 	in := &autoscaling.DetachInstancesInput{
 		InstanceIds:                    aws.StringSlice([]string{id}),
 		AutoScalingGroupName:           aws.String(groupId),
@@ -54,10 +56,12 @@ func DetachInstance(client *autoscaling.AutoScaling, groupId, id string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("Instance '%s' detached.", id)
 	return nil
 }
 
 func TerminateInstanceByID(client *ec2.EC2, id string) error {
+	log.Printf("Terminating instance '%s'...", id)
 	in := &ec2.TerminateInstancesInput{
 		InstanceIds: aws.StringSlice([]string{id}),
 	}
@@ -65,5 +69,6 @@ func TerminateInstanceByID(client *ec2.EC2, id string) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("Instance '%s' succesfully terminated.", id)
 	return nil
 }

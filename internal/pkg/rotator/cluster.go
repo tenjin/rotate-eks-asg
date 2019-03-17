@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	DefaultNodeAwaitJoinTimeout      = 5 * time.Second
-	DefaultNodeAwaitReadinessTimeout = 1 * time.Second
+	DefaultNodeAwaitJoinTimeout      = 30 * time.Second
+	DefaultNodeAwaitReadinessTimeout = 10 * time.Second
 )
 
 func NewKubernetesClient() (*kubernetes.Clientset, error) {
@@ -100,7 +100,18 @@ func awaitNodeReadiness(k8s *kubernetes.Clientset, node *corev1.Node) error {
 	}
 }
 
-func DrainNodeByInstanceID(ctx context.Context, k8s *kubernetes.Clientset, providerID string) error {
+func DrainNodeByInstanceID(ctx context.Context, k8s *kubernetes.Clientset, id string) error {
+	errors := make(chan error)
+	go func() { errors <- drainNodeByInstanceID(k8s, id) }()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-errors:
+		return err
+	}
+}
+
+func drainNodeByInstanceID(k8s *kubernetes.Clientset, id string) error {
 	return nil
 }
 
