@@ -44,10 +44,10 @@ func getAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*autosca
 	return out.AutoScalingGroups[0], nil
 }
 
-func DetachInstance(client *autoscaling.AutoScaling, group, id string) error {
+func DetachInstance(client *autoscaling.AutoScaling, groupId, id string) error {
 	in := &autoscaling.DetachInstancesInput{
 		InstanceIds:                    aws.StringSlice([]string{id}),
-		AutoScalingGroupName:           aws.String(group),
+		AutoScalingGroupName:           aws.String(groupId),
 		ShouldDecrementDesiredCapacity: aws.Bool(false),
 	}
 	_, err := client.DetachInstances(in)
