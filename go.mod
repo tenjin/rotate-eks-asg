@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
 	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
+	github.com/aws/aws-sdk-go v1.18.3
 	github.com/complex64/go-utils v0.0.0-20190108122916-7eeb2ebb17c1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -29,6 +30,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 	k8s.io/api v0.0.0-20181126191744-95336914c664 // indirect
-	k8s.io/apimachinery v0.0.0-20181126123124-70adfbae261e // indirect
+	k8s.io/apimachinery v0.0.0-20181126123124-70adfbae261e
 	k8s.io/client-go v2.0.0-alpha.0.0.20181126192323-d4cbff6e80d2+incompatible
 )
