@@ -8,9 +8,7 @@ require (
 	github.com/aws/aws-sdk-go v1.18.3
 	github.com/complex64/go-utils v0.0.0-20190108122916-7eeb2ebb17c1
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c // indirect
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect
@@ -25,11 +23,14 @@ require (
 	github.com/stretchr/testify v1.3.0 // indirect
 	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a // indirect
 	golang.org/x/net v0.0.0-20190313220215-9f648a60d977 // indirect
+	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
-	k8s.io/api v0.0.0-20181126191744-95336914c664 // indirect
-	k8s.io/apimachinery v0.0.0-20181126123124-70adfbae261e
-	k8s.io/client-go v2.0.0-alpha.0.0.20181126192323-d4cbff6e80d2+incompatible
+	k8s.io/api v0.0.0-20190222213804-5cb15d344471 // indirect
+	k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
+	k8s.io/client-go v2.0.0-alpha.0.0.20190228174230-b40b2a5939e4+incompatible
+	k8s.io/klog v0.2.0 // indirect
+	sigs.k8s.io/yaml v1.1.0 // indirect
 )

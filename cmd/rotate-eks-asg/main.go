@@ -12,16 +12,18 @@ import (
 
 var (
 	cluster = kingpin.Arg("asg", "EKS cluster formed by the Auto Scaling Groups (ASG)").Required().String()
-	asgs    = kingpin.Arg("cluster", "EKS Auto Scaling Groups to rotate").Required().Strings()
+	groups  = kingpin.Arg("cluster", "EKS Auto Scaling Groups to rotate").Required().Strings()
 )
+
+func init() { // TODO
+	_ = os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
+}
 
 func main() {
 	kingpin.Parse()
 	ctx, cancel := ctxutil.ContextWithCancelSignals(os.Kill, os.Interrupt)
 	defer cancel()
-	for _, group := range *asgs {
-		if err := rotator.Rotate(ctx, *cluster, group); err != nil {
-			log.Fatal(err)
-		}
+	if err := rotator.RotateAll(ctx, *cluster, *groups); err != nil {
+		log.Fatal(err)
 	}
 }

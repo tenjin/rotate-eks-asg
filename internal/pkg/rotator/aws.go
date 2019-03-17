@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
+	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 type Group struct {
@@ -21,7 +22,10 @@ func DescribeAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*Gr
 	for _, i := range group.Instances {
 		ids = append(ids, *i.InstanceId)
 	}
-	g := &Group{*group.LaunchConfigurationName, ids}
+	g := &Group{
+		launchConfigurationName: *group.LaunchConfigurationName,
+		instanceIds:             ids,
+	}
 	return g, nil
 }
 
@@ -40,6 +44,26 @@ func getAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*autosca
 	return out.AutoScalingGroups[0], nil
 }
 
-func DetachInstance(client *autoscaling.AutoScaling, id string) error {
+func DetachInstance(client *autoscaling.AutoScaling, group, id string) error {
+	in := &autoscaling.DetachInstancesInput{
+		InstanceIds:                    aws.StringSlice([]string{id}),
+		AutoScalingGroupName:           aws.String(group),
+		ShouldDecrementDesiredCapacity: aws.Bool(false),
+	}
+	_, err := client.DetachInstances(in)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func TerminateInstanceByID(client *ec2.EC2, id string) error {
+	in := &ec2.TerminateInstancesInput{
+		InstanceIds: aws.StringSlice([]string{id}),
+	}
+	_, err := client.TerminateInstances(in)
+	if err != nil {
+		return err
+	}
 	return nil
 }
