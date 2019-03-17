@@ -4,6 +4,10 @@ Rolling Cluster Node Upgrades for AWS EKS
 
 ## Use Case
 
+Apply security fixes, rollout new Kubernetes versions, or replace faulty nodes on AWS.
+
+In general terms:
+
 - You run Kubernetes via [AWS EKS](https://aws.amazon.com/eks/)
 - Your cluster is made up of [EC2 Auto Scaling Groups (ASG)](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html)
 - You want to replace all nodes in those ASGs to [activate a new launch configuration](https://docs.aws.amazon.com/autoscaling/ec2/userguide/LaunchConfiguration.html)
