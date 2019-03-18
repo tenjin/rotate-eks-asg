@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	groups  = kingpin.Arg("cluster", "EKS Auto Scaling Groups to rotate").Required().Strings()
+	groups  = kingpin.Arg("groups", "EKS Auto Scaling Groups to rotate").Required().Strings()
 )
 
 func init() { // TODO

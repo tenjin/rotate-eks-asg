@@ -7,7 +7,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -113,6 +112,35 @@ func DrainNodeByInstanceID(ctx context.Context, k8s *kubernetes.Clientset, id st
 
 func drainNodeByInstanceID(k8s *kubernetes.Clientset, id string) error {
 	return nil
+}
+
+// 	node, err := getNodeByInstanceID(k8s, id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	oldData, err := json.Marshal(node)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	node.Spec.Unschedulable = true
+// 	newData, err := json.Marshal(node)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	patchBytes, err := strategicpatch.CreateTwoWayMergePatch(oldData, newData, obj)
+// 	if err != nil {
+// 		fmt.Fprintf(o.ErrOut, "error: unable to %s node %q: %v\n", cordonOrUncordon, nodeInfo.Name, err)
+// 		continue
+// 	}
+// 	_, err = helper.Patch(o.Namespace, nodeInfo.Name, types.StrategicMergePatchType, patchBytes, nil)
+// 	if err != nil {
+// 		fmt.Fprintf(o.ErrOut, "error: unable to %s node %q: %v\n", cordonOrUncordon, nodeInfo.Name, err)
+// 		continue
+// 	}
+// }
+
+func getNodeByInstanceID(k8s *kubernetes.Clientset, id string) (*corev1.Node, error) {
+	return nil, nil
 }
 
 func CordonNodeByProviderID(ctx context.Context, k8s *kubernetes.Clientset, providerID string) error {
