@@ -6,4 +6,4 @@ deps:
 	GO111MODULE=on go mod tidy
 	GO111MODULE=on go mod vendor
 install:
-	GO111MODULE=on go install -mod=vendor ./cmd/pinger
+	GO111MODULE=on go install -mod=vendor ./cmd/rotate-eks-asg
