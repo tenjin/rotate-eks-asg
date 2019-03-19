@@ -54,10 +54,14 @@ func RotateInstance(
 	groupId string,
 	instanceId string,
 ) error {
-	if err := CordonNodeByProviderID(ctx, k8s, instanceId); err != nil {
+	name, err := GetNodeNameByInstanceID(k8s, instanceId)
+	if err != nil {
 		return err
 	}
-	nodeSet, err := DescribeClusterNodes(k8s)
+	if err := CordonNodeByName(ctx, name); err != nil {
+		return err
+	}
+	nodeSet, err := GetClusterNodeSet(k8s)
 	if err != nil {
 		return err
 	}
@@ -67,7 +71,7 @@ func RotateInstance(
 	if err := AwaitNewNodeReady(ctx, k8s, nodeSet); err != nil {
 		return err
 	}
-	if err := DrainNodeByInstanceID(ctx, k8s, instanceId); err != nil {
+	if err := DrainNodeByName(ctx, name); err != nil {
 		return err
 	}
 	if err := TerminateInstanceByID(ec2, instanceId); err != nil {

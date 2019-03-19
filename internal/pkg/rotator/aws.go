@@ -46,7 +46,7 @@ func getAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*autosca
 }
 
 func DetachInstance(client *autoscaling.AutoScaling, groupId, id string) error {
-	fmt.Printf("Detaching instance '%s' from ASG '%s'...", id, groupId)
+	log.Printf("Detaching instance '%s' from ASG '%s'...", id, groupId)
 	in := &autoscaling.DetachInstancesInput{
 		InstanceIds:                    aws.StringSlice([]string{id}),
 		AutoScalingGroupName:           aws.String(groupId),
@@ -56,7 +56,7 @@ func DetachInstance(client *autoscaling.AutoScaling, groupId, id string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Instance '%s' detached.", id)
+	log.Printf("Instance '%s' detached.", id)
 	return nil
 }
 
