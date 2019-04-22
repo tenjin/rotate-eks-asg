@@ -2,13 +2,12 @@ package rotator
 
 import (
 	"context"
-	"log"
-
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/exec"
+	"log"
 )
 
 func RotateAll(ctx context.Context, groups []string) error {
@@ -44,6 +43,24 @@ func Rotate(ctx context.Context, groupId string) error {
 		}
 	}
 	return nil
+}
+
+func RotateByInternalDNS(ctx context.Context, instanceInternalIP string) error {
+	sess, err := session.NewSession()
+	if err != nil {
+		return err
+	}
+	asgClient := autoscaling.New(sess)
+	ec2Client := ec2.New(sess)
+	instanceID, groupID, err := DescribeInstanceByInternalDNS(ec2Client, asgClient, instanceInternalIP)
+	if err != nil {
+		return err
+	}
+	k8s, err := NewKubernetesClient()
+	if err != nil {
+		return err
+	}
+	return RotateInstance(ctx, k8s, asgClient, ec2Client, groupID, instanceID)
 }
 
 func RotateInstance(

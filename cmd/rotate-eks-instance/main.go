@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	groups = kingpin.Arg("groups", "EKS Auto Scaling Groups to rotate").Required().Strings()
+	name = kingpin.Arg("name", "Internal DNS of EKS instance to rotate").Required().String()
 )
 
 func init() {
@@ -22,7 +22,7 @@ func main() {
 	kingpin.Parse()
 	ctx, cancel := ctxutil.ContextWithCancelSignals(os.Kill, os.Interrupt)
 	defer cancel()
-	if err := rotator.RotateAll(ctx, *groups); err != nil {
+	if err := rotator.RotateByInternalDNS(ctx, *name); err != nil {
 		log.Fatal(err)
 	}
 }

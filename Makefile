@@ -7,3 +7,4 @@ deps:
 	GO111MODULE=on go mod vendor
 install:
 	GO111MODULE=on go install -mod=vendor ./cmd/rotate-eks-asg
+	GO111MODULE=on go install -mod=vendor ./cmd/rotate-eks-instance
