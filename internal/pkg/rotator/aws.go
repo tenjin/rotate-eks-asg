@@ -55,7 +55,7 @@ func DescribeInstanceByInternalDNS(
 		return "", "", errors.New(fmt.Sprintf("%s: No matching instance could be found", instanceInternalDNS))
 	}
 
-	log.Printf("Internal DNS '%s' is instance ID '%s'\n", instanceInternalDNS, instanceID)
+	log.Printf("Internal DNS '%s' is instance ID '%s'", instanceInternalDNS, instanceID)
 
 	var groupName string
 	asgInput := &autoscaling.DescribeAutoScalingInstancesInput{

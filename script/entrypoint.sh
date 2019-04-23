@@ -21,4 +21,4 @@ fi
 
 export KUBECONFIG=/tmp/.kube/config
 awsudo -u role aws eks update-kubeconfig --name ${CLUSTER:?}
-awsudo -u role rotate-eks-instance
+awsudo -u role rotate-eks-asg $1
