@@ -1,6 +1,7 @@
 package rotator
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -28,6 +29,54 @@ func DescribeAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*Gr
 		instanceIds:             ids,
 	}
 	return g, nil
+}
+
+func DescribeInstanceByInternalDNS(
+	ec2Client *ec2.EC2,
+	asgClient *autoscaling.AutoScaling,
+	instanceInternalDNS string,
+) (string, string, error) {
+	input := &ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{{
+			Name:   aws.String("network-interface.private-dns-name"),
+			Values: []*string{aws.String(instanceInternalDNS)},
+		}},
+	}
+	var instanceID string
+	err := ec2Client.DescribeInstancesPages(input,
+		func(output *ec2.DescribeInstancesOutput, isLast bool) bool {
+			instanceID = *(output.Reservations[0].Instances[0].InstanceId)
+			return false
+		})
+	if err != nil {
+		return "", "", err
+	}
+	if instanceID == "" {
+		return "", "", errors.New(fmt.Sprintf("%s: No matching instance could be found", instanceInternalDNS))
+	}
+
+	log.Printf("Internal DNS '%s' is instance ID '%s'", instanceInternalDNS, instanceID)
+
+	var groupName string
+	asgInput := &autoscaling.DescribeAutoScalingInstancesInput{
+		InstanceIds: []*string{aws.String(instanceID)},
+	}
+	err = asgClient.DescribeAutoScalingInstancesPages(asgInput,
+		func(output *autoscaling.DescribeAutoScalingInstancesOutput, isLast bool) bool {
+			for _, instance := range output.AutoScalingInstances {
+				groupName = *(instance.AutoScalingGroupName)
+				return false
+			}
+			return true
+		})
+	if err != nil {
+		return "", "", err
+	}
+	if groupName == "" {
+		return "", "", errors.New(fmt.Sprintf("%s: No matching ASG could be found", instanceInternalDNS))
+	}
+
+	return instanceID, groupName, nil
 }
 
 func getAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*autoscaling.Group, error) {

@@ -2,8 +2,9 @@ FROM golang:alpine as buildenv
 WORKDIR /go/src/github.com/tenjin/rotate-eks-asg
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /rotate-eks-asg ./cmd/rotate-eks-asg
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /rotate-eks-instance ./cmd/rotate-eks-instance
 
-# Extract `rotate-eks-asg` and ship with rest of tooling:
+# Extract and ship with rest of tooling:
 
 FROM python:3-alpine
 RUN apk add --no-cache git
@@ -24,6 +25,7 @@ RUN chmod +x \
     /usr/local/bin/aws-iam-authenticator
 
 COPY --from=buildenv /rotate-eks-asg /usr/local/bin/
+COPY --from=buildenv /rotate-eks-instance /usr/local/bin/
 ADD ./script ./script
 
 ENTRYPOINT ["./script/entrypoint.sh"]
