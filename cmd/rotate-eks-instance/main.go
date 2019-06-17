@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	name = kingpin.Arg("name", "Internal DNS of EKS instance to rotate").Required().String()
+	name      = kingpin.Arg("name", "Internal DNS of EKS instance to rotate").Required().String()
+	removeNode = kingpin.Flag("remove", "Remove instance, don't provision a replacement").Default("false").Bool()
 )
 
 func init() {
@@ -22,7 +23,7 @@ func main() {
 	kingpin.Parse()
 	ctx, cancel := ctxutil.ContextWithCancelSignals(os.Kill, os.Interrupt)
 	defer cancel()
-	if err := rotator.RotateByInternalDNS(ctx, *name); err != nil {
+	if err := rotator.RotateByInternalDNS(ctx, *name, *removeNode); err != nil {
 		log.Fatal(err)
 	}
 }
