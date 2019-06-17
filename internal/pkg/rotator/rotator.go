@@ -2,12 +2,13 @@ package rotator
 
 import (
 	"context"
+	"log"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/exec"
-	"log"
 )
 
 func RotateAll(ctx context.Context, groups []string) error {
@@ -38,14 +39,14 @@ func Rotate(ctx context.Context, groupId string) error {
 	log.Printf("Rotating ASG '%s'...\n", groupId)
 	for _, id := range group.instanceIds {
 		log.Printf("Rotating Instance '%s'...\n", id)
-		if err := RotateInstance(ctx, k8s, asgClient, ec2Client, groupId, id); err != nil {
+		if err := RotateInstance(ctx, k8s, asgClient, ec2Client, groupId, id, false); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func RotateByInternalDNS(ctx context.Context, instanceInternalIP string) error {
+func RotateByInternalDNS(ctx context.Context, instanceInternalIP string, removeNode bool) error {
 	sess, err := session.NewSession()
 	if err != nil {
 		return err
@@ -60,7 +61,7 @@ func RotateByInternalDNS(ctx context.Context, instanceInternalIP string) error {
 	if err != nil {
 		return err
 	}
-	return RotateInstance(ctx, k8s, asgClient, ec2Client, groupID, instanceID)
+	return RotateInstance(ctx, k8s, asgClient, ec2Client, groupID, instanceID, removeNode)
 }
 
 func RotateInstance(
@@ -70,6 +71,7 @@ func RotateInstance(
 	ec2 *ec2.EC2,
 	groupId string,
 	instanceId string,
+	removeNode bool,
 ) error {
 	name, err := GetNodeNameByInstanceID(k8s, instanceId)
 	if err != nil {
@@ -82,12 +84,16 @@ func RotateInstance(
 	if err != nil {
 		return err
 	}
-	if err := DetachInstance(asg, groupId, instanceId); err != nil {
+	if err := DetachInstance(asg, groupId, instanceId, removeNode); err != nil {
 		return err
 	}
-	if err := AwaitNewNodeReady(ctx, k8s, nodeSet); err != nil {
-		return err
+
+	if !removeNode {
+		if err := AwaitNewNodeReady(ctx, k8s, nodeSet); err != nil {
+			return err
+		}
 	}
+
 	if err := DrainNodeByName(ctx, name); err != nil {
 		return err
 	}
