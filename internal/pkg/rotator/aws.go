@@ -11,8 +11,8 @@ import (
 )
 
 type Group struct {
-	launchConfigurationName string
-	instanceIds             []string
+	ConfigurationName string
+	instanceIds       []string
 }
 
 func DescribeAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*Group, error) {
@@ -24,9 +24,18 @@ func DescribeAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*Gr
 	for _, i := range group.Instances {
 		ids = append(ids, *i.InstanceId)
 	}
-	g := &Group{
-		launchConfigurationName: *group.LaunchConfigurationName,
-		instanceIds:             ids,
+	g := &Group{}
+	// Check if the autoscaling group is using launch configuration or launch template
+	if group.LaunchConfigurationName != nil {
+		g = &Group{
+			ConfigurationName: *group.LaunchConfigurationName,
+			instanceIds:       ids,
+		}
+	} else {
+		g = &Group{
+			ConfigurationName: *group.LaunchTemplate.LaunchTemplateName,
+			instanceIds:       ids,
+		}
 	}
 	return g, nil
 }
