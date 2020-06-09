@@ -73,14 +73,14 @@ func RotateInstance(
 	instanceId string,
 	removeNode bool,
 ) error {
-	name, err := GetNodeNameByInstanceID(k8s, instanceId)
+	name, err := GetNodeNameByInstanceID(ctx, k8s, instanceId)
 	if err != nil {
 		return err
 	}
 	if err := CordonNodeByName(ctx, name); err != nil {
 		return err
 	}
-	nodeSet, err := GetClusterNodeSet(k8s)
+	nodeSet, err := GetClusterNodeSet(ctx, k8s)
 	if err != nil {
 		return err
 	}
