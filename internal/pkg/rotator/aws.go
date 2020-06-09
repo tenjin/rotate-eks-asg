@@ -11,8 +11,7 @@ import (
 )
 
 type Group struct {
-	launchConfigurationName string
-	instanceIds             []string
+	instanceIds []string
 }
 
 func DescribeAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*Group, error) {
@@ -25,8 +24,7 @@ func DescribeAutoScalingGroup(client *autoscaling.AutoScaling, name string) (*Gr
 		ids = append(ids, *i.InstanceId)
 	}
 	g := &Group{
-		launchConfigurationName: *group.LaunchConfigurationName,
-		instanceIds:             ids,
+		instanceIds: ids,
 	}
 	return g, nil
 }

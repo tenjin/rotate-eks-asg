@@ -43,8 +43,8 @@ func NewKubernetesClient() (*kubernetes.Clientset, error) {
 	return k8s, nil
 }
 
-func GetClusterNodeSet(k8s *kubernetes.Clientset) (sets.String, error) {
-	nodes, err := getClusterNodes(k8s)
+func GetClusterNodeSet(ctx context.Context, k8s *kubernetes.Clientset) (sets.String, error) {
+	nodes, err := getClusterNodes(ctx, k8s)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func GetClusterNodeSet(k8s *kubernetes.Clientset) (sets.String, error) {
 
 func AwaitNewNodeReady(ctx context.Context, k8s *kubernetes.Clientset, nodes sets.String) error {
 	errors := make(chan error)
-	go func() { errors <- awaitNewNodeReady(k8s, nodes) }()
+	go func() { errors <- awaitNewNodeReady(ctx, k8s, nodes) }()
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
@@ -66,23 +66,23 @@ func AwaitNewNodeReady(ctx context.Context, k8s *kubernetes.Clientset, nodes set
 	}
 }
 
-func awaitNewNodeReady(k8s *kubernetes.Clientset, nodes sets.String) error {
-	node, err := awaitNewNodeJoin(k8s, nodes)
+func awaitNewNodeReady(ctx context.Context, k8s *kubernetes.Clientset, nodes sets.String) error {
+	node, err := awaitNewNodeJoin(ctx, k8s, nodes)
 	if err != nil {
 		return err
 	}
-	if err := awaitNodeReadiness(k8s, node); err != nil {
+	if err := awaitNodeReadiness(ctx, k8s, node); err != nil {
 		return err
 	}
 	return nil
 }
 
-func awaitNewNodeJoin(k8s *kubernetes.Clientset, known sets.String) (*coreV1.Node, error) {
+func awaitNewNodeJoin(ctx context.Context, k8s *kubernetes.Clientset, known sets.String) (*coreV1.Node, error) {
 	for {
 		log.Printf("Waiting %s for new node to join cluster...", DefaultNodeAwaitJoinTimeout.String())
 		time.Sleep(DefaultNodeAwaitJoinTimeout)
 
-		nodes, err := getClusterNodes(k8s)
+		nodes, err := getClusterNodes(ctx, k8s)
 		if err != nil {
 			return nil, err
 		}
@@ -96,12 +96,12 @@ func awaitNewNodeJoin(k8s *kubernetes.Clientset, known sets.String) (*coreV1.Nod
 	}
 }
 
-func awaitNodeReadiness(k8s *kubernetes.Clientset, node *coreV1.Node) error {
+func awaitNodeReadiness(ctx context.Context, k8s *kubernetes.Clientset, node *coreV1.Node) error {
 	for {
 		log.Printf("Waiting %s for new node to be ready...", DefaultNodeAwaitReadinessTimeout.String())
 		time.Sleep(DefaultNodeAwaitReadinessTimeout)
 
-		n, err := k8s.CoreV1().Nodes().Get(node.Name, v1.GetOptions{})
+		n, err := k8s.CoreV1().Nodes().Get(ctx, node.Name, v1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -113,8 +113,8 @@ func awaitNodeReadiness(k8s *kubernetes.Clientset, node *coreV1.Node) error {
 	}
 }
 
-func GetNodeNameByInstanceID(k8s *kubernetes.Clientset, id string) (string, error) {
-	nodes, err := getClusterNodes(k8s)
+func GetNodeNameByInstanceID(ctx context.Context, k8s *kubernetes.Clientset, id string) (string, error) {
+	nodes, err := getClusterNodes(ctx, k8s)
 	if err != nil {
 		return "", err
 	}
@@ -126,8 +126,8 @@ func GetNodeNameByInstanceID(k8s *kubernetes.Clientset, id string) (string, erro
 	return "", fmt.Errorf("node '%s' is not part of the cluster", id)
 }
 
-func getClusterNodes(k8s *kubernetes.Clientset) ([]*coreV1.Node, error) {
-	list, err := k8s.CoreV1().Nodes().List(v1.ListOptions{})
+func getClusterNodes(ctx context.Context, k8s *kubernetes.Clientset) ([]*coreV1.Node, error) {
+	list, err := k8s.CoreV1().Nodes().List(ctx, v1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
