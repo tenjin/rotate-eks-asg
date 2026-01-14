@@ -11,6 +11,6 @@ require (
 	github.com/imdario/mergo v0.3.7 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	k8s.io/api v0.18.3
-	k8s.io/apimachinery v0.18.3
+	k8s.io/apimachinery v0.18.8
 	k8s.io/client-go v0.18.3
 )
